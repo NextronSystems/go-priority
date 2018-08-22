@@ -7,8 +7,6 @@ import (
 	"syscall"
 )
 
-var kernel32DLL = syscall.MustLoadDLL("kernel32")
-
 // priority classes
 var priorityMapping = map[Priority]uintptr{
 	PriorityLow:    0x00004000, // equals BELOW_NORMAL_PRIORITY_CLASS
@@ -17,19 +15,19 @@ var priorityMapping = map[Priority]uintptr{
 }
 
 func setPriority(priority Priority) error {
-	// https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
-	setPriorityClass, err := kernel32DLL.FindProc("SetPriorityClass")
-	if err != nil {
+	kernel32 := syscall.NewLazyDLL("kernel32.dll")
+	setPriorityClass := kernel32.NewProc("SetPriorityClass")
+	if err := setPriorityClass.Find(); err != nil {
 		return err
 	}
 	handle, err := syscall.GetCurrentProcess()
 	if err != nil {
 		return err
 	}
-	_, _, errno := syscall.Syscall(setPriorityClass.Addr(), uintptr(handle), priorityMapping[priority], 0, 0)
-	if errno != 0 {
-		return fmt.Errorf("SetPriorityClass(%x, %x, %x, 0x0, 0x0): %s",
-			setPriorityClass.Addr(), uintptr(handle), priorityMapping[priority], errno.Error())
+	defer syscall.CloseHandle(handle)
+	r1, _, errno := setPriorityClass.Call(uintptr(handle), priorityMapping[priority])
+	if r1 == 0 {
+		return fmt.Errorf("SetPriorityClass(0x%x, 0x%x): %s", uintptr(handle), priorityMapping[priority], errno)
 	}
 	return nil
 }

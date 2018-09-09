@@ -4,9 +4,11 @@ package priority
 type Priority int
 
 const (
-	PriorityLow Priority = iota
+	PriorityVeryLow Priority = iota
+	PriorityLow
 	PriorityMedium
 	PriorityHigh
+	PriorityVeryHigh
 )
 
 func SetPriority(priority Priority) error {

@@ -9,9 +9,11 @@ import (
 
 // priority classes
 var priorityMapping = map[Priority]uintptr{
-	PriorityLow:    0x00004000, // equals BELOW_NORMAL_PRIORITY_CLASS
-	PriorityMedium: 0x00000020, // equals NORMAL_PRIORITY_CLASS
-	PriorityHigh:   0x00008000, // equals ABOVE_NORMAL_PRIORITY_CLASS
+	PriorityVeryLow:  0x00000040, // equals IDLE_PRIORITY_CLASS
+	PriorityLow:      0x00004000, // equals BELOW_NORMAL_PRIORITY_CLASS
+	PriorityMedium:   0x00000020, // equals NORMAL_PRIORITY_CLASS
+	PriorityHigh:     0x00008000, // equals ABOVE_NORMAL_PRIORITY_CLASS
+	PriorityVeryHigh: 0x00000080, // equals HIGH_PRIORITY_CLASS
 }
 
 func setPriority(priority Priority) error {

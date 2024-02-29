@@ -1,4 +1,5 @@
-// +build !windows
+//go:build !windows && !linux
+// +build !windows,!linux
 
 package priority
 
